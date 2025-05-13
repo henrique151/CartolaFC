@@ -43,8 +43,7 @@ Utiliza a **API oficial do Cartola**, o serviço de mensagens da **Twilio**, e �
 1. **Clone o repositório:**
 
 ```bash
-git clone https://github.com/seu-usuario/CartolaFC-AlertBot.git
-cd CartolaFC-AlertBot
+git clone https://github.com/henrique151/CartolaFC.git
 ```
 
 2. **Crie um arquivo `.env` com suas credenciais:**

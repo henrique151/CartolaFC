@@ -66,7 +66,7 @@ PORT=5000
 
 4. **Adicione o link da rota `/verificar` no UptimeRobot:**
 
-   * Ex: `https://cartola-alerto-bot.onrender.com/verificar`
+   * Ex: `https://cartola-alerta.onrender.com/verificar`
    * Configure para checar a cada 5 minutos.
 
 ---

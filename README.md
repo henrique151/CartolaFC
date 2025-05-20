@@ -1,5 +1,3 @@
-Claro! Aqui está o arquivo `README.md` atualizado para refletir as alterações no código, incluindo a troca do Twilio pela UltraMsg:
-
 ---
 
 # 📢 CartolaFC AlertBot – Alerta de Fechamento do Mercado via WhatsApp
@@ -13,7 +11,7 @@ Utiliza a **API oficial do Cartola**, o serviço de mensagens da **UltraMsg**, e
 
 ## 🔎 Como Funciona
 
-1. ⏱ A cada 5 minutos, o UptimeRobot acessa a rota `/verificar` da aplicação hospedada no Render.
+1. ⏱ A cada 5 minutos, o UptimeRobot acessa a rota da aplicação hospedada no Render.
 2. 🧠 O servidor consulta o fechamento do mercado via API do Cartola.
 3. 📲 Se estiver faltando 1 hora ou menos para o fechamento, uma mensagem é enviada por **WhatsApp** via **UltraMsg**.
 
@@ -69,12 +67,6 @@ PORT=5000
      - `TOKEN`
      - `NUMERO_DESTINO`
      - `PORT` = `5000`
-
-4. **Adicione o link da rota `/verificar` no UptimeRobot:**
-
-   - Exemplo: `https://cartola-alerta.onrender.com/verificar`
-   - Configure para checar a cada 5 minutos.
-
 ---
 
 ## 📞 Exemplo de Alerta no WhatsApp:

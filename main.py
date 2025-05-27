@@ -1,4 +1,5 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, jsonify
+from twilio.rest import Client
 from datetime import datetime, timedelta
 import requests
 import threading
@@ -10,21 +11,25 @@ load_dotenv()
 
 app = Flask(__name__)
 
-INSTANCE_ID = os.getenv('INSTANCE_ID')
-TOKEN = os.getenv('TOKEN')
+TWILIO_SID = os.getenv("TWILIO_SID")
+TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_FROM = "whatsapp:+14155238886"
 NUMERO_DESTINO = os.getenv('NUMERO_DESTINO')
-URL_BASE = f'https://api.ultramsg.com/{INSTANCE_ID}/messages/chat'
+
+twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 
 mensagem_enviada = False
+contador_execucoes = 0
+ultimo_horario = None
 
 
 def credenciais_validas():
     """Verifica se as credenciais estão corretas e preenchidas."""
-    if not INSTANCE_ID or not TOKEN or not NUMERO_DESTINO:
-        print("[❌] Credenciais UltraMsg ausentes.")
+    if not TWILIO_SID or not TWILIO_TOKEN or not NUMERO_DESTINO:
+        print("[❌] Credenciais Twilio ausentes.")
         return False
-    if not NUMERO_DESTINO.startswith("+55") or len(NUMERO_DESTINO) < 12:
-        print("[❌] Número de telefone parece inválido.")
+    if not NUMERO_DESTINO.startswith("whatsapp:+55") or len(NUMERO_DESTINO) < 20:
+        print("[❌] Número de telefone do WhatsApp parece inválido.")
         return False
     return True
 
@@ -34,20 +39,17 @@ def enviar_mensagem(mensagem):
     if not credenciais_validas():
         return "[❌] Erro: Credenciais inválidas."
 
-    payload = {
-        'token': TOKEN,
-        'to': NUMERO_DESTINO,
-        'body': mensagem
-    }
-
     try:
-        response = requests.post(URL_BASE, data=payload, timeout=10)
-        response.raise_for_status()
-        print(f"[✅] Mensagem enviada: {mensagem}")
-        return response.text
+        message = twilio_client.messages.create(
+            body=mensagem,
+            from_=TWILIO_FROM,
+            to=NUMERO_DESTINO
+        )
+        print(f"[✅] Mensagem enviada. SID: {message.sid}")
+        return "Mensagem enviada com sucesso"
     except Exception as e:
         print(f"[❌] Erro ao enviar mensagem: {e}")
-        return str(e)
+        return f"Erro: {e}"
 
 
 def pegar_fechamento_mercado():
@@ -66,42 +68,66 @@ def pegar_fechamento_mercado():
 
 def verificador_automatico():
     """Verifica periodicamente se está na hora de enviar o alerta automático."""
-    global mensagem_enviada
+    global mensagem_enviada, contador_execucoes, ultimo_horario
+    mensagem_1h_enviada = False
+    mensagem_1dia_enviada = False
+
     while True:
         fechamento = pegar_fechamento_mercado()
         agora = datetime.now()
+        contador_execucoes += 1
+        ultimo_horario = agora.strftime("%d/%m/%Y %H:%M:%S")
 
         if fechamento:
             tempo_restante = fechamento - agora
             print(
                 f"[🕒] Agora: {agora}, Fechamento: {fechamento}, Faltam: {tempo_restante}")
 
+            # Alerta de 1 dia
+            if timedelta(days=1) <= tempo_restante <= timedelta(days=1, minutes=2):
+                if not mensagem_1dia_enviada:
+                    enviar_mensagem(
+                        "⏳ Faltam 24 horas para o mercado do Cartola FC fechar! Não deixe para a última hora!")
+                    mensagem_1dia_enviada = True
+
+            # Alerta de 1 hora
             if timedelta(minutes=59) <= tempo_restante <= timedelta(hours=1, minutes=1):
-                if not mensagem_enviada:
+                if not mensagem_1h_enviada:
                     enviar_mensagem(
                         "🚨 O mercado do Cartola FC fecha em 1 hora! Faça seu time!")
-                    mensagem_enviada = True
+                    mensagem_1h_enviada = True
             elif tempo_restante > timedelta(hours=1, minutes=1):
-                mensagem_enviada = False
+                mensagem_1h_enviada = False
+
+            # Resetar alerta de 1 dia se o tempo aumentar
+            if tempo_restante > timedelta(days=1, minutes=2):
+                mensagem_1dia_enviada = False
 
         time.sleep(60)
 
 
+@app.route("/status")
+def status():
+    return jsonify({
+        "execucoes": contador_execucoes,
+        "horario": ultimo_horario or "Ainda não verificado"
+    })
+
+
 @app.route("/")
 def home():
-    """Página com botão manual."""
     return render_template_string("""
     <html>
-        <head>
-            <title>Enviar Alerta Manual</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
-            <h1>🔔 Alerta Cartola FC</h1>
+        <head><title>Cartola FC Alerta</title></head>
+        <body style="text-align: center; font-family: Arial;">
+            <h1>📢 Alerta do Cartola FC</h1>
+            <p>⏳ Número de verificações: <strong id="verificacoes">{{ execucoes }}</strong></p>
+            <p>🕒 Última verificação: <strong id="horario">{{ horario }}</strong></p>
             <button onclick="enviarAlerta()" 
-                    style="padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                style="padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
                 Enviar Alerta Agora
             </button>
-            <p id="resposta" style="margin-top: 20px; font-size: 18px;"></p>
+            <p id="resposta" style="margin-top: 20px;"></p>
 
             <script>
                 function enviarAlerta() {
@@ -109,15 +135,22 @@ def home():
                         .then(response => response.text())
                         .then(data => {
                             document.getElementById('resposta').innerText = data;
-                        })
-                        .catch(error => {
-                            document.getElementById('resposta').innerText = 'Erro ao enviar alerta 😢';
                         });
                 }
+                function atualizarStatus() {
+                    fetch('/status')
+                            .then(response => response.json())
+                            .then(data => {
+                                document.getElementById('verificacoes').innerText = data.execucoes;
+                                document.getElementById('horario').innerText = data.horario;
+                            });
+                    }
+
+                    setInterval(atualizarStatus, 5000); // Atualiza a cada 5 segundos
             </script>
         </body>
     </html>
-    """)
+    """, execucoes=contador_execucoes, horario=ultimo_horario or "Ainda não verificado")
 
 
 @app.route("/forcar-envio")

@@ -4,21 +4,21 @@
 ## 📌 Sobre o Projeto
 
 O **CartolaFC AlertBot** é uma aplicação simples que envia um alerta via **WhatsApp** avisando quando o mercado do **Cartola FC** está prestes a fechar (faltando 1 hora).
-Utiliza a **API oficial do Cartola**, o serviço de mensagens da **UltraMsg**, e é hospedado gratuitamente no **Render**, com **monitoramento periódico pelo UptimeRobot**.
+Utiliza a **API oficial do Cartola**, o serviço de mensagens da **Twilo**, e é hospedado gratuitamente no **Render**, com **monitoramento periódico pelo UptimeRobot**.
 ---
 
 ## 🔎 Como Funciona
 
 1. ⏱ A cada 5 minutos, o UptimeRobot acessa a rota da aplicação hospedada no Render.
 2. 🧠 O servidor consulta o fechamento do mercado via API do Cartola.
-3. 📲 Se estiver faltando 1 hora ou menos para o fechamento, uma mensagem é enviada por **WhatsApp** via **UltraMsg**.
+3. 📲 Se estiver faltando 1 hora ou menos para o fechamento, uma mensagem é enviada por **WhatsApp** via **Twilo**.
 
 ---
 
 ## 🧰 Tecnologias Utilizadas
 
 - **Python + Flask** – servidor web simples
-- **UltraMsg API** – envio de mensagens via WhatsApp
+- **Twilo** – envio de mensagens via WhatsApp
 - **UptimeRobot** – monitoramento automático (ping na API)
 - **Render.com** – deploy gratuito da aplicação
 - **requests** – requisições HTTP para API do Cartola
@@ -30,8 +30,8 @@ Utiliza a **API oficial do Cartola**, o serviço de mensagens da **UltraMsg**, e
 
 ### ✅ Pré-requisitos:
 
-- Conta na [UltraMsg](https://www.ultramsg.com/)
-- Número verificado no **sandbox do UltraMsg WhatsApp**
+- Conta na [Twilo](https://www.Twilo.com/)
+- Número verificado no **sandbox do Twilo WhatsApp**
 - Conta no [Render](https://render.com/)
 - Conta no [UptimeRobot](https://uptimerobot.com/)
 - Git instalado
@@ -49,9 +49,9 @@ git clone https://github.com/henrique151/CartolaFC.git
 2. **Crie um arquivo `.env` com suas credenciais:**
 
 ```env
-INSTANCE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-NUMERO_DESTINO=+55xxxxxxxxxxxx
+NUMERO_DESTINO=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_SID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 PORT=5000
 ```
 
@@ -61,8 +61,8 @@ PORT=5000
    - Conecte ao repositório GitHub.
    - No painel de variáveis de ambiente do Render, adicione:
 
-     - `INSTANCE_ID`
-     - `TOKEN`
+     - `TWILIO_SID`
+     - `TWILIO_AUTH_TOKEN`
      - `NUMERO_DESTINO`
      - `PORT` = `5000`
 

@@ -6,6 +6,7 @@ import threading
 import time
 import os
 from dotenv import load_dotenv
+import pytz
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ twilio_client = Client(TWILIO_SID, TWILIO_TOKEN)
 mensagem_enviada = False
 contador_execucoes = 0
 ultimo_horario = None
+fuso_brasil = pytz.timezone('America/Sao_Paulo')
 
 
 def credenciais_validas():
@@ -53,14 +55,18 @@ def enviar_mensagem(mensagem):
 
 
 def pegar_fechamento_mercado():
-    """Obtém o horário de fechamento do mercado do Cartola FC."""
     try:
         url = "https://api.cartola.globo.com/mercado/status"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         dados = response.json()
         timestamp = dados["fechamento"]["timestamp"]
-        return datetime.fromtimestamp(timestamp)
+
+        # converte para timezone Brasília
+        dt_utc = datetime.fromtimestamp(timestamp, tz=pytz.UTC)
+        dt_brasilia = dt_utc.astimezone(fuso_brasil)
+
+        return dt_brasilia
     except Exception as e:
         print(f"[❌] Erro ao buscar o fechamento do mercado: {e}")
         return None
@@ -74,7 +80,9 @@ def verificador_automatico():
 
     while True:
         fechamento = pegar_fechamento_mercado()
-        agora = datetime.now()
+        agora_utc = datetime.now(tz=pytz.UTC)
+        agora = agora_utc.astimezone(fuso_brasil)  # hora local
+
         contador_execucoes += 1
         ultimo_horario = agora.strftime("%d/%m/%Y %H:%M:%S")
 

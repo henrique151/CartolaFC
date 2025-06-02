@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Cartola FC - Alertas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+    <main class="container">
+        <h1>📢 Cartola FC - Alertas de Fechamento</h1>
+
+        <div class="card">
+            <div class="label">Número de verificações:</div>
+            <div class="value" id="contador">{{ contador }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Horário Atual:</div>
+            <div class="value" id="horario_atual">{{ horario_atual }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Horário do fechamento:</div>
+            <div class="value" id="fechamento">{{ fechamento or 'Indisponível' }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Dias restantes para fechamento:</div>
+            <div class="value" id="dias_restantes">{{ dias_restantes or 'Indisponível' }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Horário previsto alerta 1 dia:</div>
+            <div class="value" id="horario_previsto_1d">{{ horario_previsto_1d or 'Indisponível' }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Horário previsto alerta 1 hora:</div>
+            <div class="value" id="horario_previsto_1h">{{ horario_previsto_1h or 'Indisponível' }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Alerta 1 dia enviado?</div>
+            <div class="value" id="alerta_1d">{{ 'Sim' if alerta_1d else 'Não' }}</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Alerta 1 hora enviado?</div>
+            <div class="value" id="alerta_1h">{{ 'Sim' if alerta_1h else 'Não' }}</div>
+        </div>
+
+        <button class="btn" onclick="enviarAlerta()">Enviar Alerta Manual</button>
+        <p id="resposta" class="resposta"></p>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

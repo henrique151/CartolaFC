@@ -3,8 +3,8 @@
 
 ## 📌 Sobre o Projeto
 
-O **CartolaFC AlertBot** é uma aplicação simples que envia um alerta via **WhatsApp** avisando quando o mercado do **Cartola FC** está prestes a fechar (faltando 1 hora).
-Utiliza a **API oficial do Cartola**, o serviço de mensagens da **Twilio**, e é hospedado gratuitamente no **Render**, com **monitoramento periódico pelo UptimeRobot**.
+### O **CartolaFC AlertBot** é uma aplicação simples que envia um alerta via **WhatsApp** avisando quando o mercado do **Cartola FC** está prestes a fechar (faltando 1 hora).
+### Utiliza a **API oficial do Cartola**, o serviço de mensagens da **Twilio**, e é hospedado gratuitamente no **Render**, com **monitoramento periódico pelo UptimeRobot**.
 ---
 
 ## 🔎 Como Funciona
@@ -71,6 +71,7 @@ PORT=5000
 ## 📞 Exemplo de Alerta no WhatsApp:
 
 ```
+🚨 O mercado do Cartola FC fecha em 1 dia! Faça seu time!
 🚨 O mercado do Cartola FC fecha em 1 hora! Faça seu time!
 ```
 
@@ -79,6 +80,7 @@ PORT=5000
 ## 🤝 Contribuições
 
 Sinta-se livre para abrir issues ou pull requests. Melhorias são sempre bem-vindas! ⚽
+Acesse para ver na prática: https://cartolafc.onrender.com
 
 ---
 
